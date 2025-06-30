@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hapus Latar Belakang Gambar</title>
+    <style>
+        /* CSS yang sebelumnya ada di static/style.css */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f2f7; /* Warna latar belakang yang lebih cerah */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid #cce7ee; /* Border tipis */
+        }
+
+        h1 {
+            color: #007bff; /* Warna biru untuk judul */
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        /* Styling untuk input file */
+        input[type="file"] {
+            display: block; /* Membuat input file di baris baru */
+            width: calc(100% - 20px); /* Sesuaikan lebar */
+            padding: 12px 10px;
+            margin: 0 auto 25px auto; /* Tengah dan beri margin bawah */
+            border: 1px solid #a8dadc; /* Border berwarna */
+            border-radius: 8px;
+            font-size: 1em;
+            color: #457b9d;
+            background-color: #f1faee;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background: #0056b3;
+        }
+
+        /* Styling untuk tombol submit */
+        button {
+            background-color: #28a745; /* Warna hijau */
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Styling untuk pesan loading/error */
+        .message {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .message p {
+            margin: 0;
+            font-size: 1em;
+            color: #666;
+        }
+
+        .error {
+            background-color: #ffe0e6;
+            color: #d9534f;
+            border: 1px solid #d9534f;
+        }
+
+        /* Spinner untuk loading */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #007bff;
+            animation: spin 1s ease infinite;
+            margin: 15px auto 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Styling area hasil */
+        #result {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+
+        #result h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        #outputImage {
+            max-width: 100%;
+            height: auto;
+            border: 2px dashed #a8dadc; /* Border putus-putus */
+            border-radius: 8px;
+            margin-top: 25px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #f7f7f7; /* Latar belakang abu-abu muda untuk gambar transparan */
+        }
+
+        /* Styling untuk tautan unduh */
+        #downloadLink {
+            display: inline-block;
+            background-color: #17a2b8; /* Warna cyan */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 30px;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.2);
+        }
+
+        #downloadLink:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+        }
+
+        #downloadLink:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Penghapus Latar Belakang Gratis</h1>
+        <p>Unggah gambar Anda di sini untuk menghapus latar belakangnya secara otomatis.</p>
+
+        <!-- Form untuk mengunggah file. Penting: enctype="multipart/form-data" -->
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="imageUpload" name="file" accept="image/*" required>
+            <button type="submit">Hapus Latar Belakang</button>
+        </form>
+
+        <!-- Area untuk menampilkan pesan loading dan hasil -->
+        <div id="loading" class="message" style="display: none;">
+            <p>Memproses gambar... Mohon tunggu.</p>
+            <div class="spinner"></div>
+        </div>
+        <div id="error" class="message error" style="display: none;"></div>
+
+        <div id="result" style="display: none;">
+            <h2>Hasil:</h2>
+            <!-- Gambar yang telah dihapus latar belakangnya akan ditampilkan di sini -->
+            <img id="outputImage" src="" alt="Gambar tanpa latar belakang">
+            <!-- Tautan untuk mengunduh gambar -->
+            <a id="downloadLink" href="#" download="gambar_tanpa_latar_belakang.png">Unduh Gambar</a>
+        </div>
+    </div>
+
+    <script>
+        // Mendapatkan elemen-elemen DOM
+        const uploadForm = document.getElementById('uploadForm');
+        const imageUpload = document.getElementById('imageUpload');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const outputImage = document.getElementById('outputImage');
+        const downloadLink = document.getElementById('downloadLink');
+
+        // Menambahkan event listener untuk submit form
+        uploadForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Mencegah refresh halaman saat submit form
+
+            // Sembunyikan pesan sebelumnya dan tampilkan loading
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            const file = imageUpload.files[0]; // Dapatkan file yang diunggah
+
+            if (!file) {
+                errorDiv.textContent = 'Silakan pilih file gambar terlebih dahulu.';
+                errorDiv.style.display = 'block';
+                loadingDiv.style.display = 'none';
+                return;
+            }
+
+            // Buat objek FormData untuk mengirim file
+            const formData = new FormData();
+            formData.append('file', file); // 'file' harus cocok dengan nama input di backend (request.files['file'])
+
+            try {
+                // Kirim permintaan POST ke endpoint '/upload' di backend
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Periksa apakah respons berhasil (status 2xx)
+                if (response.ok) {
+                    // Dapatkan respons sebagai Blob (binary data untuk gambar)
+                    const blob = await response.blob();
+                    // Buat URL objek dari Blob
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    // Atur sumber gambar dan tautan unduh
+                    outputImage.src = imageUrl;
+                    downloadLink.href = imageUrl;
+                    downloadLink.textContent = `Unduh Gambar (${file.name.split('.')[0] || 'hasil'}.png)`;
+                    resultDiv.style.display = 'block'; // Tampilkan area hasil
+                } else {
+                    // Jika respons tidak berhasil, baca pesan error dari backend
+                    const errorMessage = await response.text();
+                    errorDiv.textContent = `Error: ${errorMessage}`;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                // Tangani kesalahan jaringan atau kesalahan lain yang terjadi
+                errorDiv.textContent = `Terjadi kesalahan jaringan: ${error.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none'; // Sembunyikan loading setelah selesai
+            }
+        });
+    </script>
+</body>
+</html>
+
